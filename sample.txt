@@ -1,0 +1,13 @@
+Retrieval-Augmented Generation (RAG) is an AI technique that combines information retrieval with text generation. It was introduced by researchers at Facebook AI in 2020 and has since become one of the most important patterns in building production AI applications.
+
+The core idea behind RAG is simple but powerful. Instead of relying only on what the model learned during training, you retrieve relevant documents at query time and inject them as context into the prompt. This allows the model to answer questions about information it was never trained on.
+
+RAG solves two major problems in AI systems. First, it lets the model answer questions about private or proprietary data. Second, it significantly reduces hallucinations because the model is grounded in real retrieved text rather than generating answers purely from memory.
+
+The ingestion pipeline is the first major component of a RAG system. During ingestion, documents are loaded from various sources such as PDFs, text files, websites, or databases. The raw text is then split into smaller overlapping chunks using a technique called chunking. Each chunk is then converted into a vector embedding using an embedding model like OpenAIs text-embedding-3-small. These embeddings are stored in a vector database such as pgvector, Pinecone, or Weaviate.
+
+The retrieval pipeline is the second major component. When a user asks a question, the question is first converted into a vector embedding using the same embedding model used during ingestion. This query vector is then compared against all stored chunk vectors using a similarity metric called cosine similarity. The top matching chunks are retrieved and ranked by their similarity score.
+
+The generation pipeline is the final component. The retrieved chunks are injected into the LLM prompt as context alongside the users original question. The language model then generates an answer grounded in the retrieved context. This is why RAG systems are much more accurate than vanilla LLM queries on private data.
+
+Vector databases are a critical piece of the RAG architecture. Unlike traditional databases that search by exact keyword matches, vector databases search by semantic meaning. This means a query about automobiles will correctly match documents about

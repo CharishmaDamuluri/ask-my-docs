@@ -2,25 +2,39 @@
   "name": "ask-my-docs",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:embeddings": "tsc --outDir .tmp-test --module commonjs --target es2022 --lib es2022,dom,es2022.intl --esModuleInterop true --skipLibCheck true test-embeddings.ts lib/embeddings.ts && node .tmp-test/test-embeddings.js",
+    "test:chunker": "tsc --outDir .tmp-test --module commonjs --target es2022 --lib es2022,dom --esModuleInterop true --skipLibCheck true test-chunker.ts lib/chunker.ts && node .tmp-test/test-chunker.js"
   },
   "dependencies": {
+    "@ai-sdk/gateway": "^3.0.61",
+    "@ai-sdk/react": "^3.0.110",
+    "@neondatabase/serverless": "^1.0.2",
+    "@vercel/postgres": "^0.10.0",
+    "ai": "^6.0.97",
     "next": "16.1.6",
+    "openai": "^6.22.0",
+    "pdf-parse": "^2.4.5",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "unpdf": "^1.4.0",
+    "vercel": "^50.25.6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pdf-parse": "^1.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
