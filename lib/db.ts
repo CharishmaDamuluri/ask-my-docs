@@ -1,4 +1,4 @@
-import { sql } from '@vercel/postgres';
+import { sql } from "@vercel/postgres";
 
 /* Run this once - it creates pgvector extension and table to store chunks and embeddings*/
 export async function setupDatabase() {
@@ -34,29 +34,32 @@ export async function insertChunk({
   source,
   chunkIndex,
   embedding,
+  project = "ask-my-docs",
 }: {
   content: string;
   source: string;
   chunkIndex: number;
   embedding: number[];
+  project?: string;
 }) {
-  // pgvector expects the vector as a string '[0.1, 0.2, 0.3, ...]'
-  const embeddingStr = `[${embedding.join(',')}]`;
-
+  const embeddingStr = `[${embedding.join(",")}]`;
   await sql`
-    INSERT INTO document_chunks (content, source, chunk_index, embedding)
-    VALUES (${content}, ${source}, ${chunkIndex}, ${embeddingStr}::vector)
+    INSERT INTO document_chunks (content, source, chunk_index, embedding, project)
+    VALUES (${content}, ${source}, ${chunkIndex}, ${embeddingStr}::vector, ${project})
   `;
 }
 
 /* Finds the top K chunks most similar to the query embedding. */
- /* The <=> operator is pgvector's cosine distance operator.
+/* The <=> operator is pgvector's cosine distance operator.
  * Lower distance = more similar, so we ORDER BY distance ascending.
  * We convert to similarity score (1 - distance) so higher = better.
  */
-export async function similaritySearch(queryEmbedding: number[], topK = 5) {
-  const embeddingStr = `[${queryEmbedding.join(',')}]`;
-
+export async function similaritySearch(
+  queryEmbedding: number[],
+  topK = 5,
+  project = "ask-my-docs",
+) {
+  const embeddingStr = `[${queryEmbedding.join(",")}]`;
   const result = await sql`
     SELECT
       content,
@@ -64,10 +67,10 @@ export async function similaritySearch(queryEmbedding: number[], topK = 5) {
       chunk_index,
       1 - (embedding <=> ${embeddingStr}::vector) AS similarity
     FROM document_chunks
+    WHERE project = ${project}
     ORDER BY embedding <=> ${embeddingStr}::vector
     LIMIT ${topK}
   `;
-
   return result.rows as {
     content: string;
     source: string;
